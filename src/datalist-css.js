@@ -37,6 +37,13 @@ Note the <datalist> should be placed immediately after its <input>.
       dl.addEventListener('keydown', listKey);
       dl.addEventListener('click', listSet);
 
+      // event handlers for datalist removal
+      document.body.addEventListener('keyup', (e) => {
+        if (dl && !input.parentElement.contains(document.activeElement)) listHide(listActive);
+      });
+      document.body.addEventListener('click', () => {
+        if (dl && !input.parentElement.contains(document.activeElement)) listHide(listActive);
+      });
     }
 
     // show datalist
@@ -78,7 +85,7 @@ Note the <datalist> should be placed immediately after its <input>.
 
     const v = input.value.trim().toLowerCase();
     Array.from(input.datalist.getElementsByTagName('option')).forEach(opt => {
-      opt.setAttribute('tabindex', 0);
+      opt.setAttribute('tabindex', -1);
       opt.style.display = !v || opt.value.toLowerCase().includes(v) ? 'block' : 'none';
     });
 
@@ -96,14 +103,9 @@ Note the <datalist> should be placed immediately after its <input>.
       case 40: {
         // arrow down
         let opt = input.datalist.firstElementChild;
-        if (!opt.offsetHeight) opt = visibleSibling(opt, 1);
         opt && opt.focus();
         break;
       }
-
-      case 9:   // tab
-        listHide(input.datalist);
-        break;
 
       case 13:  // enter
       case 32:  // space
@@ -141,9 +143,9 @@ Note the <datalist> should be placed immediately after its <input>.
       e.preventDefault();
 
     }
-    else if (kc === 9 || kc === 13 || kc === 32) {
+    else if (kc === 13 || kc === 32) {
 
-      // tab, enter, space: use value
+      // enter, space: use value
       listSet(e);
 
     }
